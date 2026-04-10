@@ -1,0 +1,49 @@
+﻿html {
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+body {
+    margin-bottom: 60px;
+}
+
+/* Sidebar */
+#sidebar {
+    width: 100px;
+    min-height: 100vh;
+    transition: all 0.3s;
+}
+
+    #sidebar.collapsed {
+        width: 200px;
+    }
+
+/* Content */
+#content {
+    transition: all 0.3s;
+}
+
+/* ขยับ content ตาม sidebar */
+#sidebar.collapsed + #content {
+    margin-left: 150px;
+}
+
+#sidebar:not(.collapsed) + #content {
+    margin-left: 250px;
+}
+
+/* Focus style */
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}

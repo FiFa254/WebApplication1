@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Basic CIUD and Grant Permission</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+
+<body>
+
+    <!--  Header -->
+    <nav class="navbar navbar-light bg-white border-bottom px-3">
+        <!-- ปุ่ม toggle -->
+        <button class="btn btn-primary" id="toggleSidebar">
+            ☰
+        </button>
+        <span class="navbar-brand mb-0 h5">
+            @ViewData["Title"] - Basic CIUD and Grant Permission
+        </span>
+
+        
+    </nav>
+
+    <!-- Main Layout -->
+    <div class="d-flex">
+
+        <!-- Sidebar -->
+        <div id="sidebar" class="bg-light border">
+            <ul class="nav flex-column p-2">
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-controller="Home" asp-action="Contract">Contract</a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Content -->
+        <div id="content" class="flex-grow-1 p-1">
+            <main>
+                @RenderBody()
+            </main>
+        </div>
+
+    </div>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js"></script>
+
+</body>
+</html>
