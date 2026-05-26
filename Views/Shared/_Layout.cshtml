@@ -1,54 +1,83 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Basic CIUD and Grant Permission</title>
+    <title>@ViewData["Title"] - Basic CRUD and Grant Permission</title>
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 
 <body>
-
-    <!--  Header -->
-    <nav class="navbar navbar-light bg-white border-bottom px-3">
-        <!-- ปุ่ม toggle -->
-        <button class="btn btn-primary" id="toggleSidebar">
-            ☰
+    <nav class="app-header">
+        <button class="sidebar-toggle" id="toggleSidebar" type="button" aria-label="Toggle navigation">
+            <span></span>
+            <span></span>
+            <span></span>
         </button>
-        <span class="navbar-brand mb-0 h5">
-            @ViewData["Title"] - Basic CIUD and Grant Permission
-        </span>
-
-        
+        <div>
+            <span class="app-eyebrow">Basic CRUD</span>
+            <h1 class="app-title">@ViewData["Title"]</h1>
+        </div>
     </nav>
 
-    <!-- Main Layout -->
-    <div class="d-flex">
-
-        <!-- Sidebar -->
-        <div id="sidebar" class="bg-light border">
-            <ul class="nav flex-column p-2">
+    <div class="app-shell">
+        <aside id="sidebar" class="app-sidebar">
+            <div class="sidebar-brand">W1</div>
+            <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
+                    <a class="nav-link" asp-controller="Home" asp-action="Index">
+                        <span class="sidebar-icon" aria-hidden="true">
+                            <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
+                                <path d="M8 3.293l6 6V14a1 1 0 0 1-1 1h-3v-3H6v3H3a1 1 0 0 1-1-1v-4.707l6-6z" />
+                            </svg>
+                        </span>
+                        <span class="sidebar-text">Home</span>
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" asp-controller="Home" asp-action="Contract">Contract</a>
+                    <a class="nav-link" asp-controller="Home" asp-action="AddProfile">
+                        <span class="sidebar-icon" aria-hidden="true">
+                            <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
+                                <path d="M8 1a4 4 0 0 1 3.46 6.01A6.99 6.99 0 0 1 15 13v1H1v-1a6.99 6.99 0 0 1 3.54-5.99A4 4 0 0 1 8 1z" />
+                            </svg>
+                        </span>
+                        <span class="sidebar-text">Add Profile</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Home" asp-action="Contact">
+                        <span class="sidebar-icon" aria-hidden="true">
+                            <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
+                                <path d="M2 2h12v12H2z" />
+                            </svg>
+                        </span>
+                        <span class="sidebar-text">Projects</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Home" asp-action="Permission">
+                        <span class="sidebar-icon" aria-hidden="true">
+                            <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
+                                <path d="M8 1a4 4 0 0 1 4 4v2h1a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h1V5a4 4 0 0 1 4-4z" />
+                            </svg>
+                        </span>
+                        <span class="sidebar-text">Permission</span>
+                    </a>
                 </li>
             </ul>
-        </div>
+        </aside>
 
-        <!-- Content -->
-        <div id="content" class="flex-grow-1 p-1">
-            <main>
+        <div id="content" class="app-content">
+            <main class="content-panel">
                 @RenderBody()
             </main>
         </div>
-
     </div>
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js"></script>
-
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

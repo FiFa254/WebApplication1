@@ -1,8 +1,31 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>My Home Page </p>
-</div>
+<section class="page-hero">
+    <div>
+        <h1>Welcome</h1>
+        <p>Manage profiles, contacts, and permissions from one clean workspace.</p>
+    </div>
+    <a class="btn btn-primary" asp-controller="Home" asp-action="AddProfile">Add Profile</a>
+</section>
+
+<section class="stat-grid">
+    <div class="stat-card">
+        <strong>CRUD</strong>
+        <span>Create and review profile information.</span>
+    </div>
+    <div class="stat-card">
+        <strong>Access</strong>
+        <span>Grant permissions with a clear table view.</span>
+    </div>
+    <div class="stat-card">
+        <strong>Contact</strong>
+        <span>Keep contact details easy to find.</span>
+    </div>
+</section>
+
+<section class="modern-card mt-4">
+    <h2 class="h5 mb-2">Getting started</h2>
+    <p class="text-muted-soft mb-0">Use the sidebar to move between pages. The layout now has responsive spacing, modern cards, and cleaner form controls.</p>
+</section>

@@ -1,0 +1,48 @@
+@model WebApplication1.Models.PermissionViewModel
+
+@{
+    ViewData["Title"] = "Permission";
+}
+
+<section class="page-hero">
+    <div>
+        <h1>Permission</h1>
+        <p>Select the permissions you want to grant and click Save.</p>
+    </div>
+</section>
+
+@if (ViewData["PermissionSaved"] as bool? == true)
+{
+    <div class="alert alert-success" role="alert">Permissions saved successfully.</div>
+}
+
+<form method="post" asp-controller="Home" asp-action="Permission">
+    @Html.AntiForgeryToken()
+    <div class="table-card">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th scope="col">Select</th>
+                    <th scope="col">Permission</th>
+                    <th scope="col">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var perm in Model.Permissions)
+                {
+                    <tr>
+                        <td>
+                            <input class="form-check-input" type="checkbox" name="SelectedPermissions" value="@perm.Name" @(System.Array.IndexOf(Model.SelectedPermissions ?? new string[0], perm.Name) >= 0 ? "checked" : "") />
+                        </td>
+                        <td class="fw-semibold">@perm.Name</td>
+                        <td class="text-muted-soft">@perm.Description</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-end mt-3">
+        <button type="submit" class="btn btn-primary">Save Permission</button>
+    </div>
+</form>

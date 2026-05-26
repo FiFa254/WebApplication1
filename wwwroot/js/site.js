@@ -1,5 +1,12 @@
-﻿document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("toggleSidebar").addEventListener("click", function () {
-        document.getElementById("sidebar").classList.toggle("collapsed");
+document.addEventListener("DOMContentLoaded", function () {
+    var toggle = document.getElementById("toggleSidebar");
+    var sidebar = document.getElementById("sidebar");
+
+    if (!toggle || !sidebar) {
+        return;
+    }
+
+    toggle.addEventListener("click", function () {
+        sidebar.classList.toggle("collapsed");
     });
 });
