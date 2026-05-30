@@ -12,5 +12,4 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<Profile> Profiles => Set<Profile>();
     public DbSet<ProfileProject> ProfileProjects => Set<ProfileProject>();
-    public DbSet<PermissionGrant> PermissionGrants => Set<PermissionGrant>();
 }

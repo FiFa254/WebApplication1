@@ -8,15 +8,6 @@ namespace WebApplication1.Controllers
 {
     public class HomeController : Controller
     {
-        private static readonly List<Permission> AvailablePermissions =
-        [
-            new Permission { Name = "Read", Description = "Allows viewing of resources" },
-            new Permission { Name = "Write", Description = "Allows creating or modifying resources" },
-            new Permission { Name = "Delete", Description = "Allows removal of resources" },
-            new Permission { Name = "Execute", Description = "Allows executing actions or commands" },
-            new Permission { Name = "Admin", Description = "Full access to system settings" }
-        ];
-
         private readonly ApplicationDbContext _context;
         private readonly ILogger<HomeController> _logger;
 
@@ -26,12 +17,53 @@ namespace WebApplication1.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var profileCount = await _context.Profiles.CountAsync();
+            var projectCount = await _context.ProfileProjects.CountAsync();
+            var recentProfiles = await _context.Profiles
+                .OrderByDescending(profile => profile.CreatedAt)
+                .Take(3)
+                .ToListAsync();
+            var recentProjects = await _context.ProfileProjects
+                .Include(project => project.Profile)
+                .OrderByDescending(project => project.Id)
+                .Take(3)
+                .ToListAsync();
+
+            ViewBag.ProfileCount = profileCount;
+            ViewBag.ProjectCount = projectCount;
+            ViewBag.RecentProfiles = recentProfiles;
+            ViewBag.RecentProjects = recentProjects;
+
             return View();
         }
 
-        public async Task<IActionResult> Contact()
+        public async Task<IActionResult> Profiles()
+        {
+            var profiles = await _context.Profiles
+                .Include(profile => profile.Projects)
+                .OrderByDescending(profile => profile.CreatedAt)
+                .ToListAsync();
+
+            return View(profiles);
+        }
+
+        public async Task<IActionResult> Profile(int id)
+        {
+            var profile = await _context.Profiles
+                .Include(p => p.Projects)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (profile is null)
+            {
+                return NotFound();
+            }
+
+            return View(profile);
+        }
+
+        public async Task<IActionResult> Projects()
         {
             var projects = await _context.ProfileProjects
                 .Include(project => project.Profile)
@@ -41,13 +73,16 @@ namespace WebApplication1.Controllers
             return View(projects);
         }
 
-        // GET: /Home/AddProfile
+        public IActionResult Contact()
+        {
+            return RedirectToAction(nameof(Projects));
+        }
+
         public IActionResult AddProfile()
         {
             return View(new ProfileViewModel());
         }
 
-        // POST: /Home/AddProfile
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddProfile(ProfileViewModel model)
@@ -137,44 +172,6 @@ namespace WebApplication1.Controllers
             await image.CopyToAsync(stream);
 
             return $"/uploads/profiles/{fileName}";
-        }
-
-        // GET: /Home/Permission
-        public async Task<IActionResult> Permission()
-        {
-            var selectedPermissions = await _context.PermissionGrants
-                .Select(permission => permission.PermissionName)
-                .ToArrayAsync();
-
-            var model = new PermissionViewModel
-            {
-                Permissions = AvailablePermissions,
-                SelectedPermissions = selectedPermissions
-            };
-
-            return View(model);
-        }
-
-        // POST: /Home/Permission
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Permission(PermissionViewModel model)
-        {
-            model.SelectedPermissions ??= [];
-
-            var existingGrants = await _context.PermissionGrants.ToListAsync();
-            _context.PermissionGrants.RemoveRange(existingGrants);
-
-            var grants = model.SelectedPermissions
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .Select(permissionName => new PermissionGrant { PermissionName = permissionName });
-
-            _context.PermissionGrants.AddRange(grants);
-            await _context.SaveChangesAsync();
-
-            model.Permissions = AvailablePermissions;
-            ViewData["PermissionSaved"] = true;
-            return View(model);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -1,0 +1,70 @@
+@model WebApplication1.Models.Profile
+
+@{
+    ViewData["Title"] = $"{Model.FirstName} {Model.LastName}";
+}
+
+<section class="page-header">
+    <h1>@Model.FirstName @Model.LastName</h1>
+    <p>Profile details and projects.</p>
+</section>
+
+<div class="profile-detail">
+    <aside class="profile-detail-sidebar">
+        @if (!string.IsNullOrWhiteSpace(Model.ProfileImagePath))
+        {
+            <img src="@Model.ProfileImagePath" alt="@Model.FirstName @Model.LastName" class="profile-detail-image" />
+        }
+        else
+        {
+            <div class="profile-detail-placeholder">No photo</div>
+        }
+    </aside>
+
+    <div class="profile-detail-info">
+        <a class="profile-detail-email" href="mailto:@Model.Email">@Model.Email</a>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Bio))
+        {
+            <p class="profile-detail-bio">@Model.Bio</p>
+        }
+        else
+        {
+            <p class="profile-detail-bio">No bio provided.</p>
+        }
+
+        <div class="section-header">
+            <h2>Projects (@Model.Projects.Count)</h2>
+        </div>
+
+        @if (!Model.Projects.Any())
+        {
+            <div class="empty-state">
+                <p>No projects listed for this profile.</p>
+            </div>
+        }
+        else
+        {
+            <div class="card-grid">
+                @foreach (var project in Model.Projects)
+                {
+                    <article class="project-card">
+                        <div class="card-placeholder">@project.ProjectName</div>
+                        <div class="project-card-body">
+                            <h3>@project.ProjectName</h3>
+                            <p>@(string.IsNullOrWhiteSpace(project.Description) ? "No description." : project.Description)</p>
+                            @if (!string.IsNullOrWhiteSpace(project.GithubLink))
+                            {
+                                <a class="btn btn-outline-primary btn-sm mt-2" href="@project.GithubLink" target="_blank" rel="noopener">View on GitHub</a>
+                            }
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<p class="mt-4">
+    <a asp-action="Profiles">&larr; Back to Profiles</a>
+</p>

@@ -1,0 +1,45 @@
+@model IEnumerable<WebApplication1.Models.Profile>
+
+@{
+    ViewData["Title"] = "Profiles";
+}
+
+<section class="page-header">
+    <h1>Profiles</h1>
+    <p>Browse all developers in the portfolio showcase.</p>
+</section>
+
+@if (!Model.Any())
+{
+    <section class="empty-state">
+        <h3>No profiles yet</h3>
+        <p>Start building the showcase by adding the first profile.</p>
+        <a class="btn btn-primary" asp-action="AddProfile">Add Profile</a>
+    </section>
+}
+else
+{
+    <div class="card-grid">
+        @foreach (var profile in Model)
+        {
+            <article class="profile-card">
+                @if (!string.IsNullOrWhiteSpace(profile.ProfileImagePath))
+                {
+                    <img src="@profile.ProfileImagePath" alt="@profile.FirstName @profile.LastName" class="profile-card-image" />
+                }
+                else
+                {
+                    <div class="card-placeholder">@profile.FirstName @profile.LastName</div>
+                }
+                <div class="profile-card-body">
+                    <h3>@profile.FirstName @profile.LastName</h3>
+                    <p>@(string.IsNullOrWhiteSpace(profile.Bio) ? "No bio provided." : profile.Bio)</p>
+                    <div class="profile-card-meta">
+                        <span class="badge">@profile.Projects.Count project(s)</span>
+                        <a asp-action="Profile" asp-route-id="@profile.Id">View profile &rarr;</a>
+                    </div>
+                </div>
+            </article>
+        }
+    </div>
+}

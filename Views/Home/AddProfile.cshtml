@@ -4,14 +4,12 @@
     ViewData["Title"] = "Add Profile";
 }
 
-<section class="page-hero">
-    <div>
-        <h2>Add Profile</h2>
-        <p>Create a profile with the details needed for contact and permission workflows.</p>
-    </div>
+<section class="page-header">
+    <h1>Add Profile</h1>
+    <p>Create your portfolio profile and showcase the projects you have built.</p>
 </section>
 
-<form asp-action="AddProfile" method="post" enctype="multipart/form-data" class="modern-card">
+<form asp-action="AddProfile" method="post" enctype="multipart/form-data" class="form-card">
     @Html.AntiForgeryToken()
 
     <div class="row">
@@ -90,7 +88,7 @@
         </div>
     </div>
 
-    <div class="d-flex gap-2 justify-content-end">
+    <div class="form-actions">
         <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
         <button type="submit" class="btn btn-primary">Save Profile</button>
     </div>

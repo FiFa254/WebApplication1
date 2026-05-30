@@ -1,0 +1,51 @@
+@model IEnumerable<WebApplication1.Models.ProfileProject>
+
+@{
+    ViewData["Title"] = "Projects";
+}
+
+<section class="page-header">
+    <h1>Projects</h1>
+    <p>Explore all projects shared by portfolio members.</p>
+</section>
+
+@if (!Model.Any())
+{
+    <section class="empty-state">
+        <h3>No projects yet</h3>
+        <p>Add a profile with project details to populate this gallery.</p>
+        <a class="btn btn-primary" asp-action="AddProfile">Add Profile</a>
+    </section>
+}
+else
+{
+    <div class="card-grid">
+        @foreach (var project in Model)
+        {
+            <article class="project-card">
+                @if (!string.IsNullOrWhiteSpace(project.Profile?.ProfileImagePath))
+                {
+                    <img src="@project.Profile.ProfileImagePath" alt="@project.ProjectName" class="project-card-image" />
+                }
+                else
+                {
+                    <div class="card-placeholder">@project.ProjectName</div>
+                }
+                <div class="project-card-body">
+                    <h3>@project.ProjectName</h3>
+                    <p>@(string.IsNullOrWhiteSpace(project.Description) ? "No description." : project.Description)</p>
+                    @if (project.Profile is not null)
+                    {
+                        <p class="project-owner">
+                            By <a asp-action="Profile" asp-route-id="@project.Profile.Id">@project.Profile.FirstName @project.Profile.LastName</a>
+                        </p>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(project.GithubLink))
+                    {
+                        <a class="btn btn-primary btn-sm mt-2" href="@project.GithubLink" target="_blank" rel="noopener">View GitHub</a>
+                    }
+                </div>
+            </article>
+        }
+    </div>
+}
