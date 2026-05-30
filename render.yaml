@@ -1,0 +1,14 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+# สร้าง PostgreSQL ฟรีบน Neon (https://neon.tech) แล้วใส่ DATABASE_URL ใน Environment
+services:
+  - type: web
+    name: webapplication1-portfolio
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: DATABASE_URL
+        sync: false

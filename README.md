@@ -70,3 +70,7 @@ Then open the local URL shown in the terminal.
 ```bash
 dotnet build WebApplication1.sln
 ```
+
+## Deploy ออนไลน์ฟรี
+
+ใช้ **Render** (แอป Docker) + **Neon** (PostgreSQL) — ดูขั้นตอนใน [DEPLOY.md](./DEPLOY.md)
