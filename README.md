@@ -25,7 +25,9 @@ ASP.NET Core MVC portfolio web application for browsing developer profiles and t
 - `Models/` — domain models and view models
 - `Views/` — Razor views
 - `Data/` — Entity Framework database context
-- `Migrations/` — EF Core database migrations
+- `Infrastructure/` — database/service configuration (`DatabaseConfiguration`)
+- `Migrations/` — EF Core database migrations (SQL Server)
+- `WebApplication1.PostgresMigrations/` — separate EF Core migrations project for the Postgres/Neon deployment target
 - `wwwroot/` — static CSS, JavaScript, and uploaded images
 
 ## Getting Started
