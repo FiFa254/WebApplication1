@@ -77,6 +77,7 @@ The Development database (`DevFolioDb_Dev`) is created and migrated on start.
 | `Hosting__UseHttpsRedirection` | `true` | Redirect HTTP to HTTPS (skipped when `PORT` is set) |
 | `RateLimiting__LoginPerMinute` | `5` | Sign-in attempts per minute per IP |
 | `PORT` | — | Listen on `http://+:PORT` (set by Render) |
+| `Seed__DemoData` | `false` | Add 3 fictional sample profiles when the database is empty (public demo) |
 
 ## Tests
 

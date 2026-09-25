@@ -125,6 +125,11 @@ using (var scope = app.Services.CreateScope())
         }
 
         logger.LogInformation("Database ready ({Provider}).", dbProvider);
+
+        if (app.Configuration.GetValue<bool>("Seed:DemoData") && await DemoData.SeedIfEmptyAsync(db))
+        {
+            logger.LogInformation("Demo profiles added (Seed:DemoData).");
+        }
     }
     catch (Exception ex)
     {

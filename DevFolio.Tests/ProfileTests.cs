@@ -3,6 +3,8 @@ using System.Net.Http.Headers;
 using DevFolio.Infrastructure;
 using DevFolio.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DevFolio.Tests;
 
@@ -91,6 +93,34 @@ public class PublicPageTests : IClassFixture<DevFolioFactory>
         Assert.Contains("Page 1 of", page1);
         Assert.DoesNotContain("Paged0 ", page2);
         Assert.Contains("Page 2 of", page2);
+    }
+}
+
+public class DemoDataTests
+{
+    [Fact]
+    public async Task DemoData_SeedsOnce_WhenEnabled()
+    {
+        using var factory = new DevFolioFactory().WithWebHostBuilder(b => b.UseSetting("Seed:DemoData", "true"));
+
+        var html = await factory.CreateClient().GetStringAsync("/Home/Profiles");
+        Assert.Contains("Mali Srisuk", html);
+
+        using var scope = factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<DevFolio.Data.ApplicationDbContext>();
+        var count = await db.Profiles.CountAsync();
+        Assert.False(await DevFolio.Data.DemoData.SeedIfEmptyAsync(db));
+        Assert.Equal(count, await db.Profiles.CountAsync());
+    }
+
+    [Fact]
+    public async Task DemoData_IsOffByDefault()
+    {
+        using var factory = new DevFolioFactory();
+
+        var html = await factory.CreateClient().GetStringAsync("/Home/Profiles");
+
+        Assert.DoesNotContain("Mali Srisuk", html);
     }
 }
 
