@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using WebApplication1.Data;
+using DevFolio.Data;
 
 #nullable disable
 
-namespace WebApplication1.PostgresMigrations.Migrations
+namespace DevFolio.PostgresMigrations.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20260530151822_InitialPostgres")]
@@ -25,7 +25,7 @@ namespace WebApplication1.PostgresMigrations.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("WebApplication1.Models.Profile", b =>
+            modelBuilder.Entity("DevFolio.Models.Profile", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -64,7 +64,7 @@ namespace WebApplication1.PostgresMigrations.Migrations
                     b.ToTable("Profiles");
                 });
 
-            modelBuilder.Entity("WebApplication1.Models.ProfileProject", b =>
+            modelBuilder.Entity("DevFolio.Models.ProfileProject", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -95,9 +95,9 @@ namespace WebApplication1.PostgresMigrations.Migrations
                     b.ToTable("ProfileProjects");
                 });
 
-            modelBuilder.Entity("WebApplication1.Models.ProfileProject", b =>
+            modelBuilder.Entity("DevFolio.Models.ProfileProject", b =>
                 {
-                    b.HasOne("WebApplication1.Models.Profile", "Profile")
+                    b.HasOne("DevFolio.Models.Profile", "Profile")
                         .WithMany("Projects")
                         .HasForeignKey("ProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -106,7 +106,7 @@ namespace WebApplication1.PostgresMigrations.Migrations
                     b.Navigation("Profile");
                 });
 
-            modelBuilder.Entity("WebApplication1.Models.Profile", b =>
+            modelBuilder.Entity("DevFolio.Models.Profile", b =>
                 {
                     b.Navigation("Projects");
                 });

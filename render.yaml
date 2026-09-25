@@ -2,13 +2,19 @@
 # สร้าง PostgreSQL ฟรีบน Neon (https://neon.tech) แล้วใส่ DATABASE_URL ใน Environment
 services:
   - type: web
-    name: webapplication1-portfolio
+    name: devfolio
     runtime: docker
     dockerfilePath: ./Dockerfile
     plan: free
-    healthCheckPath: /
+    healthCheckPath: /health
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
+      - key: ForwardedHeaders__TrustAll
+        value: "true"
       - key: DATABASE_URL
+        sync: false
+      - key: Admin__Username
+        sync: false
+      - key: Admin__PasswordHash
         sync: false

@@ -1,78 +1,99 @@
-# WebApplication1 — Portfolio Showcase
+# DevFolio — Developer Portfolio Showcase
 
-ASP.NET Core MVC portfolio web application for browsing developer profiles and their projects.
+ASP.NET Core MVC web app for browsing developer profiles and the projects they have built.
+Anyone can browse; a single admin account adds, edits, and deletes profiles.
 
 ## Tech Stack
 
-- ASP.NET Core MVC
-- .NET 8
-- Entity Framework Core
-- SQL Server
+- ASP.NET Core MVC, .NET 8
+- Entity Framework Core 8 — **PostgreSQL** (production / Docker) or **SQL Server** (local development)
+- Cookie authentication for the admin, rate-limited sign-in
+- Docker + docker-compose, xUnit integration tests
 
 ## Pages
 
-| Route | Description |
-|-------|-------------|
-| `/` | Home — hero, stats, latest profiles and projects |
-| `/Home/Profiles` | Browse all profiles |
-| `/Home/Profile/{id}` | Profile detail with projects |
-| `/Home/Projects` | Project gallery |
-| `/Home/AddProfile` | Add a new profile with projects |
+| Route | Access | Description |
+|-------|--------|-------------|
+| `/` | public | Home — hero, stats, latest profiles and projects |
+| `/Home/Profiles?page=n` | public | All profiles, 12 per page |
+| `/Home/Profile/{id}` | public | Profile detail with projects |
+| `/Home/Projects?page=n` | public | Project gallery, 12 per page |
+| `/Account/Login` | public | Admin sign-in (5 attempts per minute per IP) |
+| `/Home/AddProfile` | admin | Add a profile with up to 20 projects and a photo |
+| `/Home/EditProfile/{id}` | admin | Edit a profile, replace or remove its photo |
+| `/Home/DeleteProfile/{id}` | admin (POST) | Delete a profile, its projects, and its photo |
+| `/health` | public | Health check (database connectivity) |
 
 ## Project Structure
 
-- `Controllers/` — MVC controllers
-- `Models/` — domain models and view models
+- `Controllers/` — `HomeController` (pages + admin actions), `AccountController` (sign-in / sign-out)
+- `Models/` — entities, view models, `PagedList`
 - `Views/` — Razor views
-- `Data/` — Entity Framework database context
-- `Infrastructure/` — database/service configuration (`DatabaseConfiguration`)
-- `Migrations/` — EF Core database migrations (SQL Server)
-- `WebApplication1.PostgresMigrations/` — separate EF Core migrations project for the Postgres/Neon deployment target
-- `wwwroot/` — static CSS, JavaScript, and uploaded images
+- `Data/` — `ApplicationDbContext`
+- `Infrastructure/` — database provider selection, admin credentials, image storage, rate limiting, security headers
+- `Migrations/` — EF Core migrations for SQL Server
+- `DevFolio.PostgresMigrations/` — EF Core migrations for PostgreSQL
+- `DevFolio.Tests/` — xUnit integration tests (in-memory database)
+- `wwwroot/` — static CSS / JavaScript
 
-## Getting Started
-
-### Prerequisites
-
-- .NET 8 SDK
-- SQL Server or SQL Server Express LocalDB
-
-### Restore Packages
+## Run with Docker (recommended)
 
 ```bash
-dotnet restore
+cp .env.example .env
+docker compose build app
+docker run --rm devfolio:latest hash-password 'YourStrongPassword'   # paste the output into ADMIN_PASSWORD_HASH in .env
+docker compose up -d
 ```
 
-### Configure Database
+Open <http://localhost:8080>. Sign in at `/Account/Login` with `ADMIN_USERNAME` and the password you hashed.
 
-Update the `DefaultConnection` connection string in `appsettings.json` or `appsettings.Development.json` if needed.
+- Data: PostgreSQL volume `db-data`; uploaded photos and data protection keys in volume `app-data` (`/data` in the container).
+- Migrations run automatically on start.
+- The container serves plain HTTP. For HTTPS put a reverse proxy (Caddy, nginx, Traefik) in front and set `FORWARDED_HEADERS=true`.
 
-### Apply Migrations
+## Run locally (SQL Server LocalDB)
 
-```bash
-dotnet ef database update
-```
-
-If the `dotnet ef` command is not available:
+Prerequisites: .NET 8 SDK (or newer), SQL Server LocalDB.
 
 ```bash
-dotnet tool install --global dotnet-ef
-```
-
-### Run the App
-
-```bash
+dotnet run -- hash-password 'YourStrongPassword'        # copy the printed hash
+dotnet user-secrets set "Admin:Username" "admin"
+dotnet user-secrets set "Admin:PasswordHash" "<hash>"
 dotnet run
 ```
 
-Then open the local URL shown in the terminal.
+The Development database (`DevFolioDb_Dev`) is created and migrated on start.
 
-## Build
+## Configuration
+
+| Setting (env var) | Default | Purpose |
+|---|---|---|
+| `ConnectionStrings__DefaultConnection` | LocalDB | SQL Server or PostgreSQL (`Host=...`) connection string |
+| `DATABASE_URL` | — | `postgres://` URL (Render / Neon); overrides the connection string |
+| `Admin__Username`, `Admin__PasswordHash` | — | Admin account. If either is missing, admin sign-in is disabled |
+| `Storage__UploadsPath` | `wwwroot/uploads` | Folder for uploaded photos (served at `/uploads`) |
+| `DataProtection__KeysPath` | — | Folder for auth / antiforgery keys so sign-ins survive restarts |
+| `ForwardedHeaders__TrustAll` | `false` | Trust `X-Forwarded-*` — only behind a reverse proxy |
+| `Hosting__UseHttpsRedirection` | `true` | Redirect HTTP to HTTPS (skipped when `PORT` is set) |
+| `RateLimiting__LoginPerMinute` | `5` | Sign-in attempts per minute per IP |
+| `PORT` | — | Listen on `http://+:PORT` (set by Render) |
+
+## Tests
 
 ```bash
-dotnet build WebApplication1.sln
+dotnet test DevFolio.sln
 ```
 
-## Deploy ออนไลน์ฟรี
+## Adding a migration
 
-ใช้ **Render** (แอป Docker) + **Neon** (PostgreSQL) — ดูขั้นตอนใน [DEPLOY.md](./DEPLOY.md)
+Model changes need a migration for **both** providers:
+
+```bash
+dotnet ef migrations add <Name>
+DEVFOLIO_PG="Host=localhost;Database=DevFolioDb;Username=postgres;Password=..." \
+  dotnet ef migrations add <Name> --project DevFolio.PostgresMigrations --startup-project DevFolio.PostgresMigrations
+```
+
+## Deploy on Render + Neon
+
+See [DEPLOY.md](./DEPLOY.md).

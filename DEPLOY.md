@@ -1,4 +1,4 @@
-# Deploy Portfolio ออนไลน์ฟรี (Render + Neon)
+# Deploy DevFolio ออนไลน์ฟรี (Render + Neon)
 
 โปรเจกต์นี้เป็น **ASP.NET Core MVC** — ใช้ **Render** รันแอป + **Neon** เก็บข้อมูล PostgreSQL (แพลน Free ทั้งคู่)
 
@@ -7,7 +7,7 @@
 | แอป .NET | [Render](https://render.com) Web Service (Docker) |
 | ฐานข้อมูล | [Neon](https://neon.tech) PostgreSQL |
 
-Repo: `https://github.com/FiFa254/WebApplication1`
+Repo: `https://github.com/FiFa254/devfolio`
 
 ---
 
@@ -22,7 +22,7 @@ Repo: `https://github.com/FiFa254/WebApplication1`
 
 1. Push โค้ดขึ้น GitHub
 2. [dashboard.render.com](https://dashboard.render.com) → **New** → **Web Service**
-3. เชื่อม repo `WebApplication1`
+3. เชื่อม repo `DevFolio`
 4. ตั้งค่า:
    - **Runtime:** Docker
    - **Dockerfile path:** `./Dockerfile`
@@ -30,15 +30,18 @@ Repo: `https://github.com/FiFa254/WebApplication1`
 5. **Environment Variables:**
    - `DATABASE_URL` = connection string จาก Neon (ทั้งสตริง)
    - `ASPNETCORE_ENVIRONMENT` = `Production`
+   - `ForwardedHeaders__TrustAll` = `true` (Render อยู่หลัง proxy)
+   - `Admin__Username` = ชื่อ admin
+   - `Admin__PasswordHash` = hash จาก `dotnet run -- hash-password "รหัสผ่าน"` (รันบนเครื่องตัวเอง)
 6. **Create Web Service** — รอ build จน Deploy สำเร็จ
 
-แอปจะรัน migration PostgreSQL อัตโนมัติเมื่อเริ่มทำงาน
+แอปจะรัน migration PostgreSQL อัตโนมัติเมื่อเริ่มทำงาน — Render ตรวจ `/health` ว่าแอปพร้อม
 
 ---
 
 ## 3. Blueprint (ทางเลือก)
 
-มีไฟล์ `render.yaml` ใน repo — ใน Render เลือก **New** → **Blueprint** แล้วชี้ repo (ใส่ `DATABASE_URL` เองหลังสร้าง)
+มีไฟล์ `render.yaml` ใน repo — ใน Render เลือก **New** → **Blueprint** แล้วชี้ repo (ใส่ `DATABASE_URL`, `Admin__Username`, `Admin__PasswordHash` เองหลังสร้าง)
 
 ---
 
@@ -46,13 +49,9 @@ Repo: `https://github.com/FiFa254/WebApplication1`
 
 ใช้ SQL Server LocalDB ตาม `appsettings.json` ได้เหมือนเดิม:
 
-```powershell
-cd WebApplication1
-dotnet ef database update
-dotnet run
-```
+ดูหัวข้อ "Run locally" ใน [README.md](./README.md) — migration รันอัตโนมัติ ไม่ต้อง `dotnet ef database update`
 
-ถ้าจะทดสบบแบบ production ให้ตั้ง `DATABASE_URL` ชี้ไป Neon แล้ว `dotnet run`
+ถ้าจะทดสอบแบบ production ให้ตั้ง `DATABASE_URL` ชี้ไป Neon แล้ว `dotnet run`
 
 ---
 
@@ -60,7 +59,8 @@ dotnet run
 
 - **Render:** แอป sleep เมื่อไม่มี traffic (~15 นาที); เปิดครั้งแรกอาจช้า 30–60 วินาที
 - **Neon:** มี quota ฟรีพอสำหรับโปรเจกต์ส่วนตัว
-- **รูปอัปโหลด** ใน `wwwroot/uploads` บน Render Free **อาจหายหลัง redeploy** (ต้องการถาวรให้ใช้ cloud storage เช่น S3, Cloudinary)
+- **รูปอัปโหลด** บน Render Free **หายหลัง redeploy** เพราะไม่มี disk ถาวร — ต้องการถาวรให้ใช้ Render Disk (แพลนเสียเงิน) แล้วตั้ง `Storage__UploadsPath` + `DataProtection__KeysPath` ไปที่ disk นั้น หรือใช้ Docker compose บนเซิร์ฟเวอร์ตัวเอง (README)
+- ไม่มี `DataProtection__KeysPath` ถาวร = admin ต้อง sign in ใหม่หลัง redeploy
 
 ---
 

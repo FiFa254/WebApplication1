@@ -1,4 +1,4 @@
-namespace WebApplication1.Infrastructure;
+namespace DevFolio.Infrastructure;
 
 public static class DatabaseConfiguration
 {

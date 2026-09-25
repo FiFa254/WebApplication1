@@ -735,3 +735,98 @@ textarea.form-control {
         width: 100%;
     }
 }
+
+/* Admin, status messages, paging */
+:root {
+    --danger: #f87171;
+}
+
+.btn-outline-danger {
+    border: 1px solid rgba(248, 113, 113, 0.6);
+    background: transparent;
+    color: var(--danger);
+}
+
+.btn-outline-danger:hover {
+    background: rgba(248, 113, 113, 0.12);
+    color: var(--danger);
+}
+
+.status-message {
+    margin-bottom: 1.25rem;
+    padding: 0.85rem 1.1rem;
+    border: 1px solid rgba(52, 211, 153, 0.25);
+    border-radius: var(--radius-sm);
+    background: rgba(52, 211, 153, 0.08);
+    color: var(--success);
+    font-weight: 600;
+}
+
+.validation-summary-errors ul {
+    margin: 0 0 1rem;
+    padding: 0.85rem 1.1rem 0.85rem 2rem;
+    border: 1px solid rgba(248, 113, 113, 0.3);
+    border-radius: var(--radius-sm);
+    background: rgba(248, 113, 113, 0.08);
+    color: var(--danger);
+}
+
+.admin-actions {
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.admin-actions form {
+    margin: 0;
+}
+
+.site-nav-form {
+    display: inline;
+    margin: 0;
+}
+
+.site-nav-button {
+    border: none;
+    background: none;
+    font: inherit;
+    cursor: pointer;
+}
+
+.pager {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    color: var(--text-muted);
+}
+
+.login-card {
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+.current-image {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.current-image img {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+}
+
+.current-image label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0;
+    font-weight: 500;
+}

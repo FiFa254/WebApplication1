@@ -1,4 +1,4 @@
-@model IEnumerable<WebApplication1.Models.ProfileProject>
+@model PagedList<ProfileProject>
 
 @{
     ViewData["Title"] = "Projects";
@@ -9,23 +9,26 @@
     <p>Explore all projects shared by portfolio members.</p>
 </section>
 
-@if (!Model.Any())
+@if (Model.TotalCount == 0)
 {
     <section class="empty-state">
         <h3>No projects yet</h3>
-        <p>Add a profile with project details to populate this gallery.</p>
-        <a class="btn btn-primary" asp-action="AddProfile">Add Profile</a>
+        <p>Projects appear here when a profile lists them.</p>
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <a class="btn btn-primary" asp-action="AddProfile">Add Profile</a>
+        }
     </section>
 }
 else
 {
     <div class="card-grid">
-        @foreach (var project in Model)
+        @foreach (var project in Model.Items)
         {
             <article class="project-card">
                 @if (!string.IsNullOrWhiteSpace(project.Profile?.ProfileImagePath))
                 {
-                    <img src="@project.Profile.ProfileImagePath" alt="@project.ProjectName" class="project-card-image" />
+                    <img src="@project.Profile.ProfileImagePath" alt="@project.ProjectName" class="project-card-image" loading="lazy" />
                 }
                 else
                 {
@@ -42,10 +45,12 @@ else
                     }
                     @if (!string.IsNullOrWhiteSpace(project.GithubLink))
                     {
-                        <a class="btn btn-primary btn-sm mt-2" href="@project.GithubLink" target="_blank" rel="noopener">View GitHub</a>
+                        <a class="btn btn-primary btn-sm mt-2" href="@project.GithubLink" target="_blank" rel="noopener noreferrer">View Project</a>
                     }
                 </div>
             </article>
         }
     </div>
+
+    <partial name="_Pager" model="@(new PagerModel(Model.Page, Model.TotalPages, "Projects"))" />
 }

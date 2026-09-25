@@ -1,0 +1,14 @@
+**/bin/
+**/obj/
+**/.vs/
+**/.vscode/
+**/*.user
+.git/
+.github/
+.env
+DevFolio.Tests/
+wwwroot/uploads/
+Dockerfile
+docker-compose*.yml
+*.md
+ui-preview.png

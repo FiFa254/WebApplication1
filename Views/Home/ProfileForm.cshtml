@@ -1,0 +1,114 @@
+@model DevFolio.Models.ProfileViewModel
+
+@{
+    ViewData["Title"] = Model.IsEdit ? "Edit Profile" : "Add Profile";
+    var action = Model.IsEdit ? "EditProfile" : "AddProfile";
+}
+
+<section class="page-header">
+    <h1>@ViewData["Title"]</h1>
+    <p>@(Model.IsEdit ? "Update the profile details and its projects." : "Create a portfolio profile and showcase the projects it has built.")</p>
+</section>
+
+<form asp-action="@action" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data" class="form-card">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="row">
+        <div class="col-md-6 form-group">
+            <label asp-for="FirstName"></label>
+            <input asp-for="FirstName" class="form-control" placeholder="First name" />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6 form-group">
+            <label asp-for="LastName"></label>
+            <input asp-for="LastName" class="form-control" placeholder="Last name" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" placeholder="name@example.com" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Bio"></label>
+        <textarea asp-for="Bio" class="form-control" placeholder="Short profile note"></textarea>
+        <span asp-validation-for="Bio" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ProfileImage"></label>
+        @if (!string.IsNullOrWhiteSpace(Model.ProfileImagePath))
+        {
+            <div class="current-image">
+                <img src="@Model.ProfileImagePath" alt="Current profile image" />
+                <label><input asp-for="RemoveImage" type="checkbox" /> Remove current image</label>
+            </div>
+        }
+        <input asp-for="ProfileImage" class="form-control" accept="image/png,image/jpeg,image/webp" />
+        <span asp-validation-for="ProfileImage" class="text-danger"></span>
+        <small class="text-muted-soft">JPG, PNG, or WebP. Maximum file size: 2 MB.@(Model.IsEdit ? " Choose a file to replace the current image." : "")</small>
+    </div>
+
+    <div class="project-section">
+        <div class="section-heading">
+            <div>
+                <h3>Projects</h3>
+                <p>Add up to @ProfileViewModel.MaxProjects projects. Leave a row empty to skip it.</p>
+            </div>
+            <button type="button" class="btn btn-outline-primary" id="add-project" data-max="@ProfileViewModel.MaxProjects">Add Project</button>
+        </div>
+
+        <div id="project-list">
+            @for (var i = 0; i < Model.Projects.Count; i++)
+            {
+                <div class="project-item" data-project-index="@i">
+                    <div class="project-item-header">
+                        <strong>Project @(i + 1)</strong>
+                        <button type="button" class="btn btn-outline-secondary btn-sm remove-project">Remove</button>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label asp-for="Projects[i].ProjectName"></label>
+                            <input asp-for="Projects[i].ProjectName" class="form-control" placeholder="Project name" />
+                            <span asp-validation-for="Projects[i].ProjectName" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label asp-for="Projects[i].GithubLink"></label>
+                            <input asp-for="Projects[i].GithubLink" class="form-control" placeholder="https://github.com/user/repo" />
+                            <span asp-validation-for="Projects[i].GithubLink" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Projects[i].Description"></label>
+                        <textarea asp-for="Projects[i].Description" class="form-control" placeholder="Project description"></textarea>
+                        <span asp-validation-for="Projects[i].Description" class="text-danger"></span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="form-actions">
+        @if (Model.IsEdit)
+        {
+            <a asp-action="Profile" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancel</a>
+        }
+        else
+        {
+            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+        }
+        <button type="submit" class="btn btn-primary">Save Profile</button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/profile-form.js" asp-append-version="true"></script>
+}
