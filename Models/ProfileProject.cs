@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace WebApplication1.Models;
+namespace DevFolio.Models;
 
 public class ProfileProject
 {

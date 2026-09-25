@@ -1,0 +1,43 @@
+# DevFolio + PostgreSQL
+#   1. cp .env.example .env   and fill in the values
+#   2. docker compose up -d --build
+#   3. open http://localhost:8080  (admin sign-in: /Account/Login)
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: devfolio
+      POSTGRES_USER: devfolio
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devfolio -d devfolio"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    image: devfolio:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=devfolio;Username=devfolio;Password=${POSTGRES_PASSWORD}"
+      Admin__Username: ${ADMIN_USERNAME:?Set ADMIN_USERNAME in .env}
+      Admin__PasswordHash: ${ADMIN_PASSWORD_HASH:?Set ADMIN_PASSWORD_HASH in .env}
+      # No TLS inside the container; put a reverse proxy (Caddy, nginx, Traefik) in front for HTTPS
+      # and set FORWARDED_HEADERS=true so client IPs and https are detected.
+      Hosting__UseHttpsRedirection: "false"
+      ForwardedHeaders__TrustAll: ${FORWARDED_HEADERS:-false}
+    volumes:
+      - app-data:/data
+
+volumes:
+  db-data:
+  app-data:

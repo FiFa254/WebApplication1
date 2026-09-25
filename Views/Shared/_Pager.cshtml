@@ -1,0 +1,16 @@
+@model PagerModel
+
+@if (Model.TotalPages > 1)
+{
+    <nav class="pager" aria-label="Pages">
+        @if (Model.Page > 1)
+        {
+            <a class="btn btn-outline-secondary btn-sm" asp-action="@Model.Action" asp-route-page="@(Model.Page - 1)">&larr; Previous</a>
+        }
+        <span>Page @Model.Page of @Model.TotalPages</span>
+        @if (Model.Page < Model.TotalPages)
+        {
+            <a class="btn btn-outline-secondary btn-sm" asp-action="@Model.Action" asp-route-page="@(Model.Page + 1)">Next &rarr;</a>
+        }
+    </nav>
+}

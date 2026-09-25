@@ -2,8 +2,8 @@
     ViewData["Title"] = "Home";
     var profileCount = (int)(ViewBag.ProfileCount ?? 0);
     var projectCount = (int)(ViewBag.ProjectCount ?? 0);
-    var recentProfiles = ViewBag.RecentProfiles as IEnumerable<WebApplication1.Models.Profile> ?? [];
-    var recentProjects = ViewBag.RecentProjects as IEnumerable<WebApplication1.Models.ProfileProject> ?? [];
+    var recentProfiles = ViewBag.RecentProfiles as IEnumerable<ProfileSummary> ?? [];
+    var recentProjects = ViewBag.RecentProjects as IEnumerable<DevFolio.Models.ProfileProject> ?? [];
 }
 
 <section class="hero">
@@ -12,7 +12,7 @@
         <h1>Discover talent.<br />Explore projects.</h1>
         <p class="hero-lead">
             A curated space to browse developer profiles and the projects they have built.
-            Add your own profile and share your work with the world.
+            See what each developer has built, with links to the code.
         </p>
         <div class="hero-actions">
             <a class="btn btn-primary" asp-action="Profiles">Browse Profiles</a>
@@ -44,7 +44,7 @@
             <a class="section-link" asp-action="Profiles">View all &rarr;</a>
         </div>
         <div class="card-grid">
-            @foreach (var profile in recentProfiles)
+            @foreach (var (profile, profileProjectCount) in recentProfiles)
             {
                 <article class="profile-card">
                     @if (!string.IsNullOrWhiteSpace(profile.ProfileImagePath))
@@ -59,7 +59,7 @@
                         <h3>@profile.FirstName @profile.LastName</h3>
                         <p>@(string.IsNullOrWhiteSpace(profile.Bio) ? "No bio yet." : profile.Bio)</p>
                         <div class="profile-card-meta">
-                            <span class="badge">@profile.Projects.Count project(s)</span>
+                            <span class="badge">@profileProjectCount project(s)</span>
                             <a asp-action="Profile" asp-route-id="@profile.Id">View profile &rarr;</a>
                         </div>
                     </div>
@@ -97,7 +97,7 @@
                         }
                         @if (!string.IsNullOrWhiteSpace(project.GithubLink))
                         {
-                            <a class="btn btn-outline-primary btn-sm mt-2" href="@project.GithubLink" target="_blank" rel="noopener">GitHub</a>
+                            <a class="btn btn-outline-primary btn-sm mt-2" href="@project.GithubLink" target="_blank" rel="noopener noreferrer">View Project</a>
                         }
                     </div>
                 </article>
@@ -110,7 +110,10 @@
 {
     <section class="empty-state">
         <h3>No profiles yet</h3>
-        <p>Be the first to add a profile and showcase your projects.</p>
-        <a class="btn btn-primary" asp-action="AddProfile">Add Profile</a>
+        <p>Profiles and projects will appear here once they are added.</p>
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <a class="btn btn-primary" asp-action="AddProfile">Add Profile</a>
+        }
     </section>
 }

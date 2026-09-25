@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using WebApplication1.Data;
+using DevFolio.Data;
 
 #nullable disable
 
-namespace WebApplication1.Migrations
+namespace DevFolio.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20260526094030_InitialCreate")]
@@ -25,7 +25,7 @@ namespace WebApplication1.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("WebApplication1.Models.PermissionGrant", b =>
+            modelBuilder.Entity("DevFolio.Models.PermissionGrant", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -46,7 +46,7 @@ namespace WebApplication1.Migrations
                     b.ToTable("PermissionGrants");
                 });
 
-            modelBuilder.Entity("WebApplication1.Models.Profile", b =>
+            modelBuilder.Entity("DevFolio.Models.Profile", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

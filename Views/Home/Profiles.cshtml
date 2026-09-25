@@ -1,4 +1,4 @@
-@model IEnumerable<WebApplication1.Models.Profile>
+@model PagedList<ProfileSummary>
 
 @{
     ViewData["Title"] = "Profiles";
@@ -9,23 +9,27 @@
     <p>Browse all developers in the portfolio showcase.</p>
 </section>
 
-@if (!Model.Any())
+@if (Model.TotalCount == 0)
 {
     <section class="empty-state">
         <h3>No profiles yet</h3>
-        <p>Start building the showcase by adding the first profile.</p>
-        <a class="btn btn-primary" asp-action="AddProfile">Add Profile</a>
+        <p>Profiles will appear here once they are added.</p>
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <a class="btn btn-primary" asp-action="AddProfile">Add Profile</a>
+        }
     </section>
 }
 else
 {
     <div class="card-grid">
-        @foreach (var profile in Model)
+        @foreach (var item in Model.Items)
         {
+            var profile = item.Profile;
             <article class="profile-card">
                 @if (!string.IsNullOrWhiteSpace(profile.ProfileImagePath))
                 {
-                    <img src="@profile.ProfileImagePath" alt="@profile.FirstName @profile.LastName" class="profile-card-image" />
+                    <img src="@profile.ProfileImagePath" alt="@profile.FirstName @profile.LastName" class="profile-card-image" loading="lazy" />
                 }
                 else
                 {
@@ -35,11 +39,13 @@ else
                     <h3>@profile.FirstName @profile.LastName</h3>
                     <p>@(string.IsNullOrWhiteSpace(profile.Bio) ? "No bio provided." : profile.Bio)</p>
                     <div class="profile-card-meta">
-                        <span class="badge">@profile.Projects.Count project(s)</span>
+                        <span class="badge">@item.ProjectCount project(s)</span>
                         <a asp-action="Profile" asp-route-id="@profile.Id">View profile &rarr;</a>
                     </div>
                 </div>
             </article>
         }
     </div>
+
+    <partial name="_Pager" model="@(new PagerModel(Model.Page, Model.TotalPages, "Profiles"))" />
 }

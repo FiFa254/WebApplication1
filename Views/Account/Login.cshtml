@@ -1,0 +1,44 @@
+@model DevFolio.Controllers.LoginViewModel
+
+@{
+    ViewData["Title"] = "Admin Sign In";
+    var configured = ViewData["AdminConfigured"] as bool? ?? false;
+}
+
+<section class="page-header">
+    <h1>Admin Sign In</h1>
+    <p>Sign in to add, edit, or delete profiles.</p>
+</section>
+
+<div class="form-card login-card">
+    @if (!configured)
+    {
+        <p class="text-danger">
+            Admin sign-in is disabled. Set <code>Admin__Username</code> and <code>Admin__PasswordHash</code> on the server.
+        </p>
+    }
+
+    <form asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="Username"></label>
+            <input asp-for="Username" class="form-control" autocomplete="username" autofocus />
+            <span asp-validation-for="Username" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Password"></label>
+            <input asp-for="Password" class="form-control" autocomplete="current-password" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Sign In</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

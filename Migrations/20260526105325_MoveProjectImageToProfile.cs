@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace WebApplication1.Migrations
+namespace DevFolio.Migrations
 {
     /// <inheritdoc />
     public partial class MoveProjectImageToProfile : Migration
