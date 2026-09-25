@@ -12,6 +12,9 @@ services:
         value: Production
       - key: ForwardedHeaders__TrustAll
         value: "true"
+      # ใส่ profile ตัวอย่าง 3 คนเมื่อฐานข้อมูลยังว่าง (ไม่แตะข้อมูลจริง)
+      - key: Seed__DemoData
+        value: "true"
       - key: DATABASE_URL
         sync: false
       - key: Admin__Username

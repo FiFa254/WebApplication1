@@ -1,75 +1,82 @@
 # Deploy DevFolio ออนไลน์ฟรี (Render + Neon)
 
-โปรเจกต์นี้เป็น **ASP.NET Core MVC** — ใช้ **Render** รันแอป + **Neon** เก็บข้อมูล PostgreSQL (แพลน Free ทั้งคู่)
-
-| ส่วน | บริการ |
+| ส่วน | บริการ (Free) |
 |------|--------|
-| แอป .NET | [Render](https://render.com) Web Service (Docker) |
-| ฐานข้อมูล | [Neon](https://neon.tech) PostgreSQL |
+| แอป .NET (Docker) | [Render](https://render.com) Web Service |
+| ฐานข้อมูล PostgreSQL | [Neon](https://neon.tech) |
 
-Repo: `https://github.com/FiFa254/devfolio`
-
----
-
-## 1. สร้างฐานข้อมูล (Neon)
-
-1. สมัคร [neon.tech](https://neon.tech)
-2. สร้าง Project → คัดลอก **connection string** แบบ `postgresql://...` หรือ `postgres://...`
+Repo: `https://github.com/FiFa254/devfolio` — ใช้เวลาประมาณ 15 นาที
 
 ---
 
-## 2. Deploy บน Render
+## 1. สร้างรหัสผ่าน admin (บนเครื่องตัวเอง)
 
-1. Push โค้ดขึ้น GitHub
-2. [dashboard.render.com](https://dashboard.render.com) → **New** → **Web Service**
-3. เชื่อม repo `DevFolio`
-4. ตั้งค่า:
-   - **Runtime:** Docker
-   - **Dockerfile path:** `./Dockerfile`
-   - **Plan:** Free
-5. **Environment Variables:**
-   - `DATABASE_URL` = connection string จาก Neon (ทั้งสตริง)
-   - `ASPNETCORE_ENVIRONMENT` = `Production`
-   - `ForwardedHeaders__TrustAll` = `true` (Render อยู่หลัง proxy)
-   - `Admin__Username` = ชื่อ admin
-   - `Admin__PasswordHash` = hash จาก `dotnet run -- hash-password "รหัสผ่าน"` (รันบนเครื่องตัวเอง)
-6. **Create Web Service** — รอ build จน Deploy สำเร็จ
+```powershell
+cd C:\Users\64502\source\repos\DevFolio
+dotnet run -- hash-password "รหัสผ่านที่ต้องการ"
+```
 
-แอปจะรัน migration PostgreSQL อัตโนมัติเมื่อเริ่มทำงาน — Render ตรวจ `/health` ว่าแอปพร้อม
+คัดลอกบรรทัดที่ขึ้นต้นด้วย `AQAAAA...` เก็บไว้ใช้ในขั้นที่ 3 — **อย่า commit ค่านี้หรือรหัสผ่านลง repo**
 
 ---
 
-## 3. Blueprint (ทางเลือก)
+## 2. สร้างฐานข้อมูล (Neon)
 
-มีไฟล์ `render.yaml` ใน repo — ใน Render เลือก **New** → **Blueprint** แล้วชี้ repo (ใส่ `DATABASE_URL`, `Admin__Username`, `Admin__PasswordHash` เองหลังสร้าง)
+1. สมัคร [neon.tech](https://neon.tech) (ใช้บัญชี GitHub ได้)
+2. **Create project** → ตั้งชื่อ `devfolio` → Region ใกล้ที่สุด (เช่น Singapore)
+3. หน้า **Dashboard → Connection string** → คัดลอกแบบ `postgresql://...` ทั้งสตริง
 
 ---
 
-## 4. รันบนเครื่อง
+## 3. Deploy บน Render
 
-ใช้ SQL Server LocalDB ตาม `appsettings.json` ได้เหมือนเดิม:
+1. สมัคร [render.com](https://render.com) ด้วยบัญชี GitHub
+2. **New → Blueprint** → เลือก repo `FiFa254/devfolio` → Render อ่าน `render.yaml` ให้เอง
+3. กรอกค่าที่ Render ถาม:
 
-ดูหัวข้อ "Run locally" ใน [README.md](./README.md) — migration รันอัตโนมัติ ไม่ต้อง `dotnet ef database update`
+   | Key | ค่า |
+   |---|---|
+   | `DATABASE_URL` | connection string จาก Neon (ขั้นที่ 2) |
+   | `Admin__Username` | ชื่อ admin เช่น `admin` |
+   | `Admin__PasswordHash` | hash จากขั้นที่ 1 |
 
-ถ้าจะทดสอบแบบ production ให้ตั้ง `DATABASE_URL` ชี้ไป Neon แล้ว `dotnet run`
+   ค่าอื่น (`ASPNETCORE_ENVIRONMENT`, `ForwardedHeaders__TrustAll`, `Seed__DemoData`) ตั้งไว้ใน `render.yaml` แล้ว
+4. **Apply** → รอ build (ครั้งแรก ~5–10 นาที) จนสถานะเป็น **Live**
+5. เปิด URL `https://devfolio-xxxx.onrender.com`
+   - หน้าแรกมี profile ตัวอย่าง 3 คน (`Seed__DemoData`) — ลบ/แก้ได้หลัง sign in
+   - Sign in ที่ `/Account/Login`
+   - ตรวจสถานะที่ `/health` ต้องได้ `Healthy`
+
+แอปรัน migration PostgreSQL อัตโนมัติเมื่อเริ่มทำงาน
+
+> ไม่ใช้ Blueprint ก็ได้: **New → Web Service** → Runtime **Docker** → Plan **Free** → Health Check Path `/health`
+> แล้วใส่ Environment ทั้ง 6 ตัว: `DATABASE_URL`, `Admin__Username`, `Admin__PasswordHash`,
+> `ASPNETCORE_ENVIRONMENT=Production`, `ForwardedHeaders__TrustAll=true`, `Seed__DemoData=true`
+
+---
+
+## 4. ใช้เป็นผลงานสมัครงาน
+
+- ใส่ URL เว็บที่ **About** ของ repo บน GitHub (ปุ่มเฟือง → Website)
+- ใส่ URL ใน README / Resume คู่กับลิงก์ repo
+- บอกผู้สัมภาษณ์ว่าเว็บ Free **หลับหลังไม่มีคนใช้ ~15 นาที** เปิดครั้งแรกรอ 30–60 วินาที
 
 ---
 
 ## 5. ข้อจำกัดแพลน Free
 
-- **Render:** แอป sleep เมื่อไม่มี traffic (~15 นาที); เปิดครั้งแรกอาจช้า 30–60 วินาที
-- **Neon:** มี quota ฟรีพอสำหรับโปรเจกต์ส่วนตัว
-- **รูปอัปโหลด** บน Render Free **หายหลัง redeploy** เพราะไม่มี disk ถาวร — ต้องการถาวรให้ใช้ Render Disk (แพลนเสียเงิน) แล้วตั้ง `Storage__UploadsPath` + `DataProtection__KeysPath` ไปที่ disk นั้น หรือใช้ Docker compose บนเซิร์ฟเวอร์ตัวเอง (README)
-- ไม่มี `DataProtection__KeysPath` ถาวร = admin ต้อง sign in ใหม่หลัง redeploy
+- **Render:** sleep เมื่อไม่มี traffic ~15 นาที; ไม่มี disk ถาวร
+  - **รูปที่อัปโหลดหายหลัง redeploy / restart** — profile ตัวอย่างไม่มีรูปจึงไม่กระทบ
+  - admin ต้อง sign in ใหม่หลัง redeploy (ไม่มี `DataProtection__KeysPath` ถาวร)
+- **Neon:** quota ฟรีพอสำหรับโปรเจกต์ส่วนตัว; ข้อมูล profile อยู่ถาวร
+- ต้องการรูปถาวร: Render Disk (เสียเงิน) แล้วตั้ง `Storage__UploadsPath` + `DataProtection__KeysPath` ไปที่ disk นั้น หรือใช้ `docker compose` บนเซิร์ฟเวอร์ตัวเอง (ดู README)
 
 ---
 
-## 6. Push การเปลี่ยนแปลง
+## 6. อัปเดตเว็บ
 
-```powershell
-git add -A
-git commit -m "Your message"
-git push
-```
+Push เข้า `master` แล้ว Render build ใหม่อัตโนมัติ (Auto-Deploy เปิดเป็นค่าเริ่มต้น)
 
-Render จะ rebuild อัตโนมัติถ้าเปิด Auto-Deploy
+## 7. รันบนเครื่อง
+
+ดูหัวข้อ "Run locally" ใน [README.md](./README.md) — migration รันอัตโนมัติ
