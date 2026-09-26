@@ -49,6 +49,20 @@ builder.Services.AddControllersWithViews();
 var dbProvider = DatabaseConfiguration.ResolveProvider(builder.Configuration);
 var connectionString = DatabaseConfiguration.GetConnectionString(builder.Configuration);
 
+// DevFolio.PostgresMigrations.dll is copied next to the app by the Dockerfile but is not listed in
+// DevFolio.deps.json (the migrations project references this one, not the other way round),
+// so the runtime would not find it on its own.
+System.Runtime.Loader.AssemblyLoadContext.Default.Resolving += (context, name) =>
+{
+    if (name.Name != "DevFolio.PostgresMigrations")
+    {
+        return null;
+    }
+
+    var path = Path.Combine(AppContext.BaseDirectory, name.Name + ".dll");
+    return File.Exists(path) ? context.LoadFromAssemblyPath(path) : null;
+};
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     if (dbProvider == DatabaseConfiguration.DatabaseProvider.PostgreSql)
