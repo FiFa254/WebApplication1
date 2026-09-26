@@ -3,6 +3,10 @@
 ASP.NET Core MVC web app for browsing developer profiles and the projects they have built.
 Anyone can browse; a single admin account adds, edits, and deletes profiles.
 
+**Live demo:** <https://devfolio-bbp9.onrender.com> (Render Free + Neon PostgreSQL, Singapore) — the first request after ~15 minutes idle takes 30–60 seconds while the app wakes up.
+
+[![CI](https://github.com/FiFa254/devfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/FiFa254/devfolio/actions/workflows/ci.yml)
+
 ## Tech Stack
 
 - ASP.NET Core MVC, .NET 8
