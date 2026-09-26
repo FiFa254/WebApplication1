@@ -17,8 +17,38 @@ jobs:
 
   docker:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: devfolio
+          POSTGRES_USER: devfolio
+          POSTGRES_PASSWORD: ci-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U devfolio -d devfolio"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v4
       - run: docker build -t devfolio:ci .
       - name: Hash command works in the image
         run: docker run --rm devfolio:ci hash-password 'ci-check' | grep -q '^AQAAAA'
+      # Same path as production: DATABASE_URL -> Postgres migrations assembly -> demo seed -> /health.
+      - name: Container starts against PostgreSQL
+        run: |
+          docker run -d --name devfolio --network host \
+            -e DATABASE_URL='postgres://devfolio:ci-password@localhost:5432/devfolio?sslmode=disable' \
+            -e PORT=8080 -e Seed__DemoData=true \
+            devfolio:ci
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:8080/health | grep -q Healthy; then break; fi
+            sleep 2
+          done
+          curl -fsS http://localhost:8080/health | grep -q Healthy
+          curl -fsS http://localhost:8080/Home/Profiles | grep -q 'Mali Srisuk'
+      - name: Container logs
+        if: always()
+        run: docker logs devfolio || true

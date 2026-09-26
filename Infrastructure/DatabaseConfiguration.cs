@@ -52,11 +52,33 @@ public static class DatabaseConfiguration
 
         var uri = new Uri(databaseUrl);
         var userInfo = uri.UserInfo.Split(':', 2);
-        var username = Uri.UnescapeDataString(userInfo[0]);
-        var password = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : string.Empty;
-        var database = uri.AbsolutePath.TrimStart('/');
-        var port = uri.Port > 0 ? uri.Port : 5432;
 
-        return $"Host={uri.Host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+        var builder = new Npgsql.NpgsqlConnectionStringBuilder
+        {
+            Host = uri.Host,
+            Port = uri.Port > 0 ? uri.Port : 5432,
+            Database = uri.AbsolutePath.TrimStart('/'),
+            Username = Uri.UnescapeDataString(userInfo[0]),
+            Password = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : string.Empty,
+            // Hosted databases (Neon, Render) need TLS; a URL can opt out with ?sslmode=disable (local / CI).
+            SslMode = ReadSslMode(uri.Query)
+        };
+
+        return builder.ConnectionString;
+    }
+
+    private static Npgsql.SslMode ReadSslMode(string query)
+    {
+        foreach (var pair in query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var parts = pair.Split('=', 2);
+            if (parts.Length == 2 && parts[0].Equals("sslmode", StringComparison.OrdinalIgnoreCase)
+                && Enum.TryParse<Npgsql.SslMode>(Uri.UnescapeDataString(parts[1]).Replace("-", ""), ignoreCase: true, out var mode))
+            {
+                return mode;
+            }
+        }
+
+        return Npgsql.SslMode.Require;
     }
 }
