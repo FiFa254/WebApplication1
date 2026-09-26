@@ -22,7 +22,7 @@
     </aside>
 
     <div class="profile-detail-info">
-        <a class="profile-detail-email" href="mailto:@Model.Email">@Model.Email</a>
+        <a class="btn btn-primary btn-sm profile-contact" asp-action="Contact" asp-route-id="@Model.Id" rel="nofollow">Contact</a>
 
         @if (!string.IsNullOrWhiteSpace(Model.Bio))
         {

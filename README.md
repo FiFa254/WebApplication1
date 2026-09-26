@@ -21,6 +21,7 @@ Anyone can browse; a single admin account adds, edits, and deletes profiles.
 | `/` | public | Home — hero, stats, latest profiles and projects |
 | `/Home/Profiles?page=n` | public | All profiles, 12 per page |
 | `/Home/Profile/{id}` | public | Profile detail with projects |
+| `/Home/Contact/{id}` | public | Contact button: redirects to `mailto:` (e-mail is never in page HTML; 10 per minute per IP) |
 | `/Home/Projects?page=n` | public | Project gallery, 12 per page |
 | `/Account/Login` | public | Admin sign-in (5 attempts per minute per IP) |
 | `/Home/AddProfile` | admin | Add a profile with up to 20 projects and a photo |
@@ -80,6 +81,7 @@ The Development database (`DevFolioDb_Dev`) is created and migrated on start.
 | `ForwardedHeaders__TrustAll` | `false` | Trust `X-Forwarded-*` — only behind a reverse proxy |
 | `Hosting__UseHttpsRedirection` | `true` | Redirect HTTP to HTTPS (skipped when `PORT` is set) |
 | `RateLimiting__LoginPerMinute` | `5` | Sign-in attempts per minute per IP |
+| `RateLimiting__ContactPerMinute` | `10` | Contact (e-mail reveal) requests per minute per IP |
 | `PORT` | — | Listen on `http://+:PORT` (set by Render) |
 | `Seed__DemoData` | `false` | Add 3 fictional sample profiles when the database is empty (public demo) |
 

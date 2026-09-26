@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using DevFolio.Data;
@@ -65,6 +66,29 @@ namespace DevFolio.Controllers
             }
 
             return View(profile);
+        }
+
+        /// <summary>
+        /// The e-mail address is never written into page HTML (scrapers harvest it); the Contact button
+        /// hits this rate-limited endpoint, which redirects to the visitor's mail app.
+        /// </summary>
+        [EnableRateLimiting(RateLimitPolicies.Contact)]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> Contact(int id)
+        {
+            var email = await _context.Profiles
+                .AsNoTracking()
+                .Where(p => p.Id == id)
+                .Select(p => p.Email)
+                .FirstOrDefaultAsync();
+
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return NotFound();
+            }
+
+            Response.Headers["X-Robots-Tag"] = "noindex, nofollow";
+            return Redirect("mailto:" + Uri.EscapeDataString(email).Replace("%40", "@"));
         }
 
         public async Task<IActionResult> Projects(int page = 1)
