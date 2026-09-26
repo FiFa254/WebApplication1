@@ -46,6 +46,24 @@ public class PublicPageTests : IClassFixture<DevFolioFactory>
         Assert.Contains("Page not found", await response.Content.ReadAsStringAsync());
     }
 
+    [Fact]
+    public async Task ProfilePage_HidesEmail_ContactRedirectsToMailto()
+    {
+        var profile = new Profile { FirstName = "Hidden", LastName = "Mail", Email = "hidden.mail@example.com" };
+        await _factory.SeedAsync(db => db.Profiles.Add(profile));
+        var client = _factory.CreateBrowser();
+
+        var html = await client.GetStringAsync($"/Home/Profile/{profile.Id}");
+        Assert.DoesNotContain("hidden.mail", html);
+        Assert.Contains($"href=\"/Home/Contact/{profile.Id}\"", html);
+
+        var contact = await client.GetAsync($"/Home/Contact/{profile.Id}");
+        Assert.Equal(HttpStatusCode.Redirect, contact.StatusCode);
+        Assert.Equal("mailto:hidden.mail@example.com", contact.Headers.Location!.OriginalString);
+
+        Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("/Home/Contact/999999")).StatusCode);
+    }
+
     [Theory]
     [InlineData("/Home/AddProfile")]
     [InlineData("/Home/EditProfile/1")]

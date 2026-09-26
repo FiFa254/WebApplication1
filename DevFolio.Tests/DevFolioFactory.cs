@@ -32,6 +32,7 @@ public sealed class DevFolioFactory : WebApplicationFactory<Program>
         builder.UseSetting("Storage:UploadsPath", UploadsPath);
         builder.UseSetting("Hosting:UseHttpsRedirection", "false");
         builder.UseSetting("RateLimiting:LoginPerMinute", LoginPerMinute.ToString());
+        builder.UseSetting("RateLimiting:ContactPerMinute", "1000");
 
         builder.ConfigureServices(services =>
         {
